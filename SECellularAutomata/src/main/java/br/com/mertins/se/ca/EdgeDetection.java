@@ -1,42 +1,60 @@
-package br.com.mertins.se.ce;
+package br.com.mertins.se.ca;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Properties;
 import javax.imageio.ImageIO;
 
 /**
  *
  * @author mertins
  */
-public class Execute {
+public class EdgeDetection {
 
-    private void process() throws IOException {
-        File fileImg = new File("src/main/resources/images/FRONT_59b97a303dbc0e51496444b8.png");
+    public void process(Properties properties) throws IOException {
+        String file = ((String) properties.get("edgedetection_file")).trim();
+        String folderDest = ((String) properties.get("edgedetection_folderDest")).trim();
+        File fileImg = new File(file);
         BufferedImage bufferedImage = ImageIO.read(fileImg);
 
         int width = bufferedImage.getWidth();
         int height = bufferedImage.getHeight();
+        int type = bufferedImage.getType();
         int[][] imageT0 = new int[height][width];
         int[][] imageT1 = new int[height][width];
 
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {
-                imageT0[row][col] = bufferedImage.getRGB(col, row);
+                imageT1[row][col] = bufferedImage.getRGB(col, row);
             }
         }
-        for (int row = 0; row < height; row++) {
-            for (int col = 0; col < width; col++) {
-                Integer[] vonNeumann = vonNeumannneighborhood(row, col, imageT0);
-                Color mycolor = new Color(imageT0[row][col]);
-                int totalAbs = 0;
-                for (Integer value : vonNeumann) {
-                    totalAbs += modulo(imageT0[row][col], value);
-                }
 
-                System.out.printf("cor [%s]  vector [%s]  totalAbs [%d]\n ", mycolor.toString(), showVector(vonNeumann), totalAbs);
+        for (int geracao = 1; geracao < 10; geracao++) {
+            for (int row = 0; row < height; row++) {
+                for (int col = 0; col < width; col++) {
+                    imageT0[row][col] = imageT1[row][col];
+                }
             }
+            for (int row = 0; row < height; row++) {
+                for (int col = 0; col < width; col++) {
+                    Integer[] vonNeumann = vonNeumannneighborhood(row, col, imageT0);
+                    int totalAbs = 0;
+                    for (Integer value : vonNeumann) {
+                        totalAbs += modulo(imageT0[row][col], value);
+                    }
+                    imageT1[row][col] = totalAbs < 20 ? 0 : imageT0[row][col];
+//                System.out.printf("cor [%s]  vector [%s]  totalAbs [%d]\n ", mycolor.toString(), showVector(vonNeumann), totalAbs);
+                }
+            }
+            BufferedImage newImage = new BufferedImage(width, height, type);
+            for (int row = 0; row < height; row++) {
+                for (int col = 0; col < width; col++) {
+                    newImage.setRGB(col, row, imageT1[row][col]);
+                }
+            }
+            ImageIO.write(newImage, "png", new File(String.format("%s%s%s_%d.png", folderDest, File.separator, fileImg.getName(), geracao)));
         }
     }
 
@@ -70,8 +88,4 @@ public class Execute {
         return sb.toString();
     }
 
-    public static void main(String[] args) throws IOException {
-
-        new Execute().process();
-    }
 }

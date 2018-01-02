@@ -16,6 +16,9 @@ public class EdgeDetection {
     public void process(Properties properties) throws IOException {
         String file = ((String) properties.get("edgedetection_file")).trim();
         String folderDest = ((String) properties.get("edgedetection_folderDest")).trim();
+        Integer maxGeneration = Integer.valueOf((String) properties.get("edgedetection_maxgeneration"));
+        Neighborhood.Type neighborhoodType = Neighborhood.Type.valueOf(((String) properties.get("edgedetection_neighborhood")).toUpperCase());
+        Integer threshold = Integer.valueOf((String) properties.get("edgedetection_threshold"));
         File fileImg = new File(file);
         BufferedImage bufferedImage = ImageIO.read(fileImg);
 
@@ -31,7 +34,7 @@ public class EdgeDetection {
             }
         }
 
-        for (int geracao = 1; geracao < 10; geracao++) {
+        for (int geracao = 1; geracao <= maxGeneration; geracao++) {
             for (int row = 0; row < height; row++) {
                 for (int col = 0; col < width; col++) {
                     imageT0[row][col] = imageT1[row][col];
@@ -39,12 +42,13 @@ public class EdgeDetection {
             }
             for (int row = 0; row < height; row++) {
                 for (int col = 0; col < width; col++) {
-                    Integer[] vonNeumann = vonNeumannneighborhood(row, col, imageT0);
+
+                    Integer[] neighborhood = Neighborhood.process(neighborhoodType, row, col, imageT0);
                     int totalAbs = 0;
-                    for (Integer value : vonNeumann) {
+                    for (Integer value : neighborhood) {
                         totalAbs += modulo(imageT0[row][col], value);
                     }
-                    imageT1[row][col] = totalAbs < 20 ? 0 : imageT0[row][col];
+                    imageT1[row][col] = totalAbs < threshold ? 0 : imageT0[row][col];
 //                System.out.printf("cor [%s]  vector [%s]  totalAbs [%d]\n ", mycolor.toString(), showVector(vonNeumann), totalAbs);
                 }
             }
@@ -56,16 +60,6 @@ public class EdgeDetection {
             }
             ImageIO.write(newImage, "png", new File(String.format("%s%s%s_%d.png", folderDest, File.separator, fileImg.getName(), geracao)));
         }
-    }
-
-    private Integer[] vonNeumannneighborhood(int row, int col, int[][] image) {
-        Integer[] values = new Integer[5];
-        values[0] = col > 0 ? image[row][col - 1] : null;
-        values[1] = col < image[0].length - 1 ? image[row][col + 1] : null;
-        values[2] = image[row][col];
-        values[3] = row > 0 ? image[row - 1][col] : null;
-        values[4] = row < image.length - 1 ? image[row + 1][col] : null;
-        return values;
     }
 
     private int modulo(Integer target, Integer neighborhood) {

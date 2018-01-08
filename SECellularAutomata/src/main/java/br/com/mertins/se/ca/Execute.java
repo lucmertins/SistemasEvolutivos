@@ -24,6 +24,9 @@ public class Execute {
             properties.load(new FileInputStream(file));
             String action = ((String) properties.get("action")).trim().toLowerCase();
             switch (action) {
+                 case "backgroundelimination":
+                    new BackgroundElimination().process(properties);
+                    break;
                 case "edgedetection":
                     new EdgeDetection().process(properties);
                     break;
@@ -38,7 +41,7 @@ public class Execute {
 
     private static void msgOut(String action, File file) {
         System.out.printf("Ação [%s] não foi realizada. Ação ou Arquivo [%s] não encontrado\n", action, file == null ? "" : file.getAbsoluteFile());
-        System.out.println("Ações possíveis: EdgeDetection");
+        System.out.println("Ações possíveis: BackgroundElimination EdgeDetection");
 
     }
 }

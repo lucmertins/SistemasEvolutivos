@@ -1,5 +1,6 @@
 package br.com.mertins.se.ca;
 
+import br.com.mertins.se.ca.util.Generic;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -30,16 +31,11 @@ public class EdgeDetection {
 
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {
-                imageT1[row][col] = bufferedImage.getRGB(col, row);
+                imageT0[row][col] = bufferedImage.getRGB(col, row);
             }
         }
 
         for (int geracao = 1; geracao <= maxGeneration; geracao++) {
-            for (int row = 0; row < height; row++) {
-                for (int col = 0; col < width; col++) {
-                    imageT0[row][col] = imageT1[row][col];
-                }
-            }
             for (int row = 0; row < height; row++) {
                 for (int col = 0; col < width; col++) {
 
@@ -58,7 +54,12 @@ public class EdgeDetection {
                     newImage.setRGB(col, row, imageT1[row][col]);
                 }
             }
-            ImageIO.write(newImage, "png", new File(String.format("%s%s%s_%d.png", folderDest, File.separator, fileImg.getName(), geracao)));
+            ImageIO.write(newImage, "png", new File(String.format("%s%s%s_edgedetec_%d.png", folderDest, File.separator, Generic.removeExtensionFile(fileImg.getName()), geracao)));
+            for (int row = 0; row < height; row++) {
+                for (int col = 0; col < width; col++) {
+                    imageT0[row][col] = imageT1[row][col];
+                }
+            }
         }
     }
 

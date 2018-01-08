@@ -14,53 +14,79 @@ import javax.imageio.ImageIO;
  */
 public class EdgeDetection {
 
-    public void process(Properties properties) throws IOException {
+    private String folderDest;
+    private Boolean save;
+    private String fileName;
+    private Integer maxGeneration;
+    private Neighborhood.Type neighborhoodType;
+    private Integer threshold;
+    private int width;
+    private int height;
+    private int type;
+    private int[][] imageT0 = new int[height][width];
+
+    public void init(Properties properties) throws IOException {
         String file = ((String) properties.get("edgedetection_file")).trim();
-        String folderDest = ((String) properties.get("edgedetection_folderDest")).trim();
-        Integer maxGeneration = Integer.valueOf((String) properties.get("edgedetection_maxgeneration"));
-        Neighborhood.Type neighborhoodType = Neighborhood.Type.valueOf(((String) properties.get("edgedetection_neighborhood")).toUpperCase());
-        Integer threshold = Integer.valueOf((String) properties.get("edgedetection_threshold"));
+        this.folderDest = ((String) properties.get("edgedetection_folderDest")).trim();
+        this.save = Boolean.valueOf(((String) properties.get("edgedetection_savefile")).trim());
+        this.maxGeneration = Integer.valueOf((String) properties.get("edgedetection_maxgeneration"));
+        this.neighborhoodType = Neighborhood.Type.valueOf(((String) properties.get("edgedetection_neighborhood")).toUpperCase());
+        this.threshold = Integer.valueOf((String) properties.get("edgedetection_threshold"));
         File fileImg = new File(file);
+        this.fileName = Generic.removeExtensionFile(fileImg.getName());
         BufferedImage bufferedImage = ImageIO.read(fileImg);
-
-        int width = bufferedImage.getWidth();
-        int height = bufferedImage.getHeight();
-        int type = bufferedImage.getType();
-        int[][] imageT0 = new int[height][width];
-        int[][] imageT1 = new int[height][width];
-
+        this.width = bufferedImage.getWidth();
+        this.height = bufferedImage.getHeight();
+        this.type = bufferedImage.getType();
+        this.imageT0 = new int[height][width];
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {
-                imageT0[row][col] = bufferedImage.getRGB(col, row);
+                this.imageT0[row][col] = bufferedImage.getRGB(col, row);
             }
         }
+    }
+
+    public void init(int[][] image, int type, Properties properties) {
+        this.imageT0 = image;
+        this.height = image.length;
+        this.width = image[0].length;
+        this.type = type;
+        this.save = Boolean.FALSE;
+        this.maxGeneration = Integer.valueOf((String) properties.get("edgedetection_maxgeneration"));
+        this.neighborhoodType = Neighborhood.Type.valueOf(((String) properties.get("edgedetection_neighborhood")).toUpperCase());
+        this.threshold = Integer.valueOf((String) properties.get("edgedetection_threshold"));
+    }
+
+    public int[][] process() throws IOException {
+        int[][] imageT1 = new int[height][width];
 
         for (int geracao = 1; geracao <= maxGeneration; geracao++) {
             for (int row = 0; row < height; row++) {
                 for (int col = 0; col < width; col++) {
-
                     Integer[] neighborhood = Neighborhood.process(neighborhoodType, row, col, imageT0);
                     int totalAbs = 0;
                     for (Integer value : neighborhood) {
                         totalAbs += modulo(imageT0[row][col], value);
                     }
                     imageT1[row][col] = totalAbs < threshold ? 0 : imageT0[row][col];
-//                System.out.printf("cor [%s]  vector [%s]  totalAbs [%d]\n ", mycolor.toString(), showVector(vonNeumann), totalAbs);
                 }
             }
-            BufferedImage newImage = new BufferedImage(width, height, type);
-            for (int row = 0; row < height; row++) {
-                for (int col = 0; col < width; col++) {
-                    newImage.setRGB(col, row, imageT1[row][col]);
+            if (save) {
+                BufferedImage newImage = new BufferedImage(width, height, type);
+                for (int row = 0; row < height; row++) {
+                    for (int col = 0; col < width; col++) {
+                        newImage.setRGB(col, row, imageT1[row][col]);
+                    }
                 }
+                ImageIO.write(newImage, "png", new File(String.format("%s%s%s_edgedetec_%d.png", folderDest, File.separator, fileName, geracao)));
             }
-            ImageIO.write(newImage, "png", new File(String.format("%s%s%s_edgedetec_%d.png", folderDest, File.separator, Generic.removeExtensionFile(fileImg.getName()), geracao)));
             for (int row = 0; row < height; row++) {
                 for (int col = 0; col < width; col++) {
                     imageT0[row][col] = imageT1[row][col];
                 }
             }
         }
+        return imageT1;
     }
 
     private int modulo(Integer target, Integer neighborhood) {

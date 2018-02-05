@@ -78,7 +78,7 @@ public class EdgeDetection {
                         newImage.setRGB(col, row, imageT1[row][col]);
                     }
                 }
-                ImageIO.write(newImage, "png", new File(String.format("%s%s%s_edgedetec_%d.png", folderDest, File.separator, fileName, geracao)));
+                ImageIO.write(newImage, "png", new File(String.format("%s%s%s_edgedetec_%d_t%d_%s.png", folderDest, File.separator, fileName, geracao,threshold,this.neighborhoodType.toString())));
             }
             for (int row = 0; row < height; row++) {
                 for (int col = 0; col < width; col++) {

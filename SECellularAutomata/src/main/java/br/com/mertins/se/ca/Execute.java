@@ -11,7 +11,7 @@ import java.util.Properties;
  * @author mertins
  */
 public class Execute {
-
+    
     public static void main(String[] args) throws FileNotFoundException, IOException {
         File file;
         if (args.length == 1) {
@@ -35,9 +35,7 @@ public class Execute {
                     edgeDetec.process();
                     break;
                 case "executewaterfall":
-                    Waterfall waterfall=new  Waterfall();
-                    waterfall.init(properties);
-                    waterfall.process();
+                    Waterfall.process(properties);
                     break;
                 default:
                     msgOut(action, file);
@@ -47,10 +45,10 @@ public class Execute {
             msgOut("", file);
         }
     }
-
+    
     private static void msgOut(String action, File file) {
         System.out.printf("Ação [%s] não foi realizada. Ação ou Arquivo [%s] não encontrado\n", action, file == null ? "" : file.getAbsoluteFile());
         System.out.println("Ações possíveis: BackgroundElimination EdgeDetection ExecuteWaterfall");
-
+        
     }
 }

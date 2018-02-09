@@ -21,15 +21,11 @@ public class Waterfall {
     private int height;
     private int type;
 
-    public void init(Properties properties) throws IOException {
+    private void init(Properties properties, File file) throws IOException {
         this.properties = properties;
-        String file = ((String) properties.get("waterfall_file")).trim();
         this.folderDest = ((String) properties.get("waterfall_folderDest")).trim();
-
-        File fileImg = new File(file);
-        BufferedImage bufferedImage = ImageIO.read(fileImg);
-        this.fileName = Generic.removeExtensionFile(fileImg.getName());
-
+        BufferedImage bufferedImage = ImageIO.read(file);
+        this.fileName = Generic.removeExtensionFile(file.getName());
         this.width = bufferedImage.getWidth();
         this.height = bufferedImage.getHeight();
         this.type = bufferedImage.getType();
@@ -41,7 +37,7 @@ public class Waterfall {
         }
     }
 
-    public void process() throws IOException {
+    private void process() throws IOException {
         BackgroundElimination back = new BackgroundElimination();
         back.init(imageT0, type);
         int[][] imgBack = back.process();
@@ -57,5 +53,26 @@ public class Waterfall {
             }
         }
         ImageIO.write(newImage, "png", new File(String.format("%s%s%s_waterfall.png", folderDest, File.separator, fileName)));
+    }
+
+    public static void process(Properties properties) throws IOException {
+
+        String aval = ((String) properties.get("waterfall_aval")).trim().toLowerCase();
+        switch (aval) {
+            case "file":
+                Waterfall waterfallUnique = new Waterfall();
+                waterfallUnique.init(properties, new File(((String) properties.get("waterfall_file")).trim()));
+                waterfallUnique.process();
+                break;
+            case "folder":
+                File folderOrig = new File(((String) properties.get("waterfall_originfolder")).trim());
+                for (File file : folderOrig.listFiles()) {
+                    Waterfall waterfall = new Waterfall();
+                    waterfall.init(properties, file);
+                    waterfall.process();
+                }
+                break;
+        }
+
     }
 }

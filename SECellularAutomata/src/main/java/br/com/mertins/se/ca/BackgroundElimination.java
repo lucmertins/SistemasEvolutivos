@@ -5,6 +5,8 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import javax.imageio.ImageIO;
 
@@ -50,9 +52,10 @@ public class BackgroundElimination {
 
     public int[][] process() throws IOException {
         int[][] imageT1 = new int[height][width];
-        int rgbBackground = imageT0[0][0];
+        int rgbBackground = detectBackground();
         Color backgroundColor = new Color(rgbBackground);
-
+//        int rgbBackground = imageT0[0][0];
+//        Color backgroundColor = new Color(rgbBackground);
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {
                 int rgbTarget = imageT0[row][col];
@@ -65,7 +68,7 @@ public class BackgroundElimination {
             }
         }
         if (save) {
-            BufferedImage newImage = new BufferedImage(width, height, type);
+            BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
             for (int row = 0; row < height; row++) {
                 for (int col = 0; col < width; col++) {
                     newImage.setRGB(col, row, imageT1[row][col]);
@@ -76,4 +79,41 @@ public class BackgroundElimination {
         return imageT1;
     }
 
+    private Integer detectBackground() {
+        int numLinha = height * 25 / 100;
+        Map<Integer, Integer> colorCount = new HashMap<>();
+        for (int row = 0; row < numLinha; row++) {
+            for (int col = 0; col < width; col++) {
+                Integer color = this.imageT0[row][col];
+                avaliaCores(color, colorCount);
+            }
+        }
+        return colorCount.entrySet().stream().max((entry1, entry2) -> entry1.getValue() > entry2.getValue() ? 1 : -1).get().getKey();
+    }
+
+    private void avaliaCores(Integer newColor, Map<Integer, Integer> colorCount) {
+        Integer best = null;
+        Integer bestModulo = Integer.MAX_VALUE;
+        for (Integer savedColor : colorCount.keySet()) {
+            int modulo = modulo(newColor, savedColor);
+            if (modulo < 50 && modulo < bestModulo) {
+                best = savedColor;
+                bestModulo = modulo;
+            }
+        }
+        if (best == null) {
+            colorCount.put(newColor, 1);
+        } else {
+            colorCount.put(best, colorCount.get(best) + 1);
+        }
+    }
+
+    private int modulo(Integer newColor, Integer savedColor) {
+        Color targetColor = new Color(newColor);
+        Color neighborhoodColor = savedColor == null ? Color.WHITE : new Color(savedColor);
+        int blue = Math.abs(targetColor.getBlue() - neighborhoodColor.getBlue());
+        int red = Math.abs(targetColor.getRed() - neighborhoodColor.getRed());
+        int green = Math.abs(targetColor.getGreen() - neighborhoodColor.getGreen());
+        return blue + red + green;
+    }
 }

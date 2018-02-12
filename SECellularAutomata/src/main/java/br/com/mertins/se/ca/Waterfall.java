@@ -46,7 +46,7 @@ public class Waterfall {
         edgeDetec.init(imgBack, type, properties);
         int[][] imgEdge = edgeDetec.process();
 
-        BufferedImage newImage = new BufferedImage(width, height, type);
+        BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {
                 newImage.setRGB(col, row, imgEdge[row][col]);

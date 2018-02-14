@@ -19,7 +19,7 @@ public class AdjustImg {
     private final int defaultHeight;
 
     public AdjustImg() {
-        this(100,60);
+        this(600,400);
     }
 
     public AdjustImg(int defaultWidth, int defaultHeight) {
@@ -76,8 +76,10 @@ public class AdjustImg {
 
     public static void main(String[] args) throws IOException {
         AdjustImg adj = new AdjustImg();
-        File folderOrig = new File("/home/mertins/Documentos/UFPel/Dr/SistemasEvolutivos/OpenCV/TrainingResenha/positive");
-        File folderDest = new File("/home/mertins/Documentos/UFPel/Dr/SistemasEvolutivos/OpenCV/TrainingResenha/positiveSameSize");
+        File folderOrig = new File("/home/mertins/Documentos/UFPel/Dr/SistemasEvolutivos/OpenCV/TrainingResenha/Spositive");
+        File folderDest = new File("/home/mertins/Documentos/UFPel/Dr/SistemasEvolutivos/OpenCV/TrainingResenha/SpositiveSameSize");
+//        File folderOrig = new File("/home/mertins/Documentos/UFPel/Dr/SistemasEvolutivos/OpenCV/TrainingResenha/negativeReduzidaQuant");
+//        File folderDest = new File("/home/mertins/Documentos/UFPel/Dr/SistemasEvolutivos/OpenCV/TrainingResenha/negativeReduzidaQuantSizeMenor");
         for (File file : folderOrig.listFiles()) {
             BufferedImage bufferImgOri = ImageIO.read(file);
             BufferedImage bufferImgNew = adj.scaleAndCut(bufferImgOri);

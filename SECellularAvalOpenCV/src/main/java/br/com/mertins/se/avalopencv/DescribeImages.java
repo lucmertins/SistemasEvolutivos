@@ -15,7 +15,7 @@ public class DescribeImages {
     private String tipo = "AC";
 
     public void positives() throws IOException {
-        File folder = new File(String.format("/home/mertins/Documentos/UFPel/Dr/SistemasEvolutivos/OpenCV/TrainingResenha/%spositiveSameSize",tipo));
+        File folder = new File(String.format("/home/mertins/Documentos/UFPel/Dr/SistemasEvolutivos/OpenCV/TrainingResenha/%spositive",tipo));
         PrintWriter writer = new PrintWriter(new FileWriter("/home/mertins/Documentos/UFPel/Dr/SistemasEvolutivos/OpenCV/TrainingResenha/resenhas.info"));
         double minProp = Double.MAX_VALUE;
         double maxProp = Double.MIN_VALUE;

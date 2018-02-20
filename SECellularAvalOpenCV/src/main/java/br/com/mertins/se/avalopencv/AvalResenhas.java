@@ -22,9 +22,9 @@ public class AvalResenhas {
 
         String tipo = "AC";
         CascadeClassifier resenhaDetector = new CascadeClassifier(String.format("/home/mertins/Documentos/UFPel/Dr/SistemasEvolutivos/OpenCV/TrainingResenha/%sdata/cascade.xml", tipo));
-//        Mat posImg = Imgcodecs.imread(String.format("/home/mertins/Documentos/UFPel/Dr/SistemasEvolutivos/OpenCV/TrainingResenha/%stestes/rpTeste3.png", tipo));
+        Mat posImg = Imgcodecs.imread(String.format("/home/mertins/Documentos/UFPel/Dr/SistemasEvolutivos/OpenCV/TrainingResenha/%stestes/rpTeste3.png", tipo));
 
-        Mat posImg = Imgcodecs.imread("/home/mertins/temp/ImgABCCC/SEimg3/FRONTVARBACKCOLOR/FRONT_59b990cc3dbc0e5149be94ac_waterfall.png");
+//        Mat posImg = Imgcodecs.imread("/home/mertins/temp/ImgABCCC/SEimg3/FRONTVARBACKCOLOR/FRONT_59b990cc3dbc0e5149be94ac_waterfall.png");
         Mat negImg = Imgcodecs.imread(String.format("/home/mertins/Documentos/UFPel/Dr/SistemasEvolutivos/OpenCV/TrainingResenha/%stestes/docTeste.png", tipo));
         String filename1 = String.format("/home/mertins/Documentos/UFPel/Dr/SistemasEvolutivos/OpenCV/TrainingResenha/%stestes/detectRpTeste3.png", tipo);
         String filename2 = String.format("/home/mertins/Documentos/UFPel/Dr/SistemasEvolutivos/OpenCV/TrainingResenha/%stestes/detectDocTeste.png", tipo);
@@ -88,8 +88,8 @@ public class AvalResenhas {
     }
 
     public static void main(String[] args) {
-        AvalResenhas.folder();
+//        AvalResenhas.folder();
 
-//       AvalResenhas.individual();
+       AvalResenhas.individual();
     }
 }

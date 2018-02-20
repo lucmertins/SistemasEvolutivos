@@ -14,6 +14,11 @@
             <artifactId>opencv</artifactId>
             <version>3.2.0-0</version>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>SECellularAutomata</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
